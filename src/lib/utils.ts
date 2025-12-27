@@ -1,3 +1,4 @@
+import type { CellRichTextValue, CellValue } from 'exceljs'
 import type { DocumentType } from '@/types/types'
 import { HUNDREDS, ONES, ONES_FEMALE, TEENS, TENS } from './constants'
 
@@ -91,4 +92,8 @@ export function documentNaming(documentType: DocumentType | 'ALL', fullnameClien
     default:
       return `Документы_${fullnameClient.replaceAll(' ', '_')}.zip`
   }
+}
+
+export function isRichTextValue(value: CellValue): value is CellRichTextValue {
+  return typeof value === 'object' && value !== null && 'richText' in value
 }

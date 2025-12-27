@@ -58,8 +58,8 @@ export const citySchema = z.string()
     return `г.${normalized}`
   })
 
-export const iikSchema = z.string().trim().refine(val => isDigits(val) && val.length === 20, { message: 'ИИК должен состоять из 20 цифр' })
+export const iikSchema = z.string().trim().length(20)
 
-export const bikSchema = z.string().trim().refine(val => isDigits(val) && val.length === 8, { message: 'БИК должен состоять из 8 цифр' })
+export const bikSchema = z.string().trim().length(8)
 
 export const bankNameSchema = z.string().trim().min(5, { message: 'Введите корректное название банка' })

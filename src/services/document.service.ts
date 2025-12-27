@@ -1,4 +1,5 @@
 import type TypeExcelJS from 'exceljs'
+import type { RichText } from 'exceljs'
 import type { DocumentFormSchema } from '@/schemes/document-form.schema'
 import type { DocumentType, Organization } from '@/types/types'
 import { notifications } from '@mantine/notifications'
@@ -8,11 +9,11 @@ import ExcelJS from 'exceljs'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import PizZip from 'pizzip'
-import { countPerAmount, documentNaming, formatNumberToRussian, formatWithSpacesNumber } from '@/lib/utils'
+import { countPerAmount, documentNaming, formatNumberToRussian, formatWithSpacesNumber, isRichTextValue } from '@/lib/utils'
 import { DocumentLoaderServiceInstance } from './document-loader.service'
 
 class DocumentService {
-  constructor() {}
+  constructor() { }
   async processDocuments(data: DocumentFormSchema, organization: Organization = 'NOMADDOCS') {
     const zip = new JSZip()
     const contract = await this.processDocumentConract(data, organization)
@@ -37,14 +38,20 @@ class DocumentService {
     await workbook.xlsx.load(documentTempalateBuffer)
 
     const sheet = workbook.getWorksheet(1)
+    const countedPerAmount = countPerAmount(Number(data.totalAmount), data.documentDate)
 
     if (sheet) {
       this.fillTemplatePlaceholdersXlsx(sheet, {
         ...data,
+        perAmount: formatWithSpacesNumber(countedPerAmount),
         documentDateFrom: dayjs(new Date(data.documentDate[0])).format('DD MMMM YYYYг'),
         documentDateTo: dayjs(new Date(data.documentDate[1])).format('DD MMMM YYYYг'),
+        documentDateFromNumeric: dayjs(new Date(data.documentDate[0])).format('DD.MM.YYYYг'),
+        documentDateToNumeric: dayjs(new Date(data.documentDate[1])).format('DD.MM.YYYYг'),
         clientIdDateFrom: dayjs(new Date(data.clientIdDateFrom)).format('DD.MM.YYYY'),
         totalAmount: formatWithSpacesNumber(data.totalAmount),
+        totalAmountRussian: formatNumberToRussian(Number(data.totalAmount)).toLocaleLowerCase(),
+        perAmountRussian: formatNumberToRussian(countedPerAmount).toLocaleLowerCase(),
       })
     }
 
@@ -56,13 +63,25 @@ class DocumentService {
   }
 
   private fillTemplatePlaceholdersXlsx(sheet: TypeExcelJS.Worksheet, data: Record<string, unknown>) {
+    const regex = /\{\{([^}]+)\}\}/g
     sheet.eachRow((row) => {
       row.eachCell((cell) => {
         if (typeof cell.value === 'string') {
-          cell.value = cell.value.replace(/\{\{(\w+)\}\}/g, (_, key) => {
+          cell.value = cell.value.replace(regex, (_, key) => {
             const v = data[key]
             return v !== undefined && v !== null ? String(v) : ''
           })
+        }
+        else if (isRichTextValue(cell.value)) {
+          cell.value = {
+            richText: cell.value.richText.map((part: RichText) => ({
+              ...part,
+              text: part.text.replace(
+                regex,
+                (_, key) => data[key] as string ?? `{{${key}}}`,
+              ),
+            })),
+          }
         }
       })
     })
