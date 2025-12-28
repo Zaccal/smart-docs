@@ -255,6 +255,8 @@ export default function DocumentForm({ type }: DocumentFormProps) {
             </Grid>
           </Fieldset>
 
+          {/* <DynamicKeyValueBlock form={form} /> */}
+
           <Button fullWidth size="lg" type="submit">
             Сделать документы
           </Button>

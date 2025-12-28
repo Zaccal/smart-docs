@@ -40,6 +40,10 @@ class DocumentService {
     const sheet = workbook.getWorksheet(1)
     const countedPerAmount = countPerAmount(Number(data.totalAmount), data.documentDate)
 
+    // if (data.cellsLine.length && sheet) {
+    //   this.fillDynamicRows(sheet, data.cellsLine, 22)
+    // }
+
     if (sheet) {
       this.fillTemplatePlaceholdersXlsx(sheet, {
         ...data,
@@ -61,6 +65,10 @@ class DocumentService {
 
     return { blob, filename }
   }
+
+  // private fillDynamicRows(sheet: ExcelJS.Worksheet, data: DynamicKeyValueSchema, startRow: number) {
+
+  // }
 
   private fillTemplatePlaceholdersXlsx(sheet: TypeExcelJS.Worksheet, data: Record<string, unknown>) {
     const regex = /\{\{([^}]+)\}\}/g

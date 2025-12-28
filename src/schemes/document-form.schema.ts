@@ -1,4 +1,5 @@
 import z from 'zod/v4'
+import { dynamicKeyValueSchema } from './dynamic-key-value.schema'
 import {
   addressSchema,
   bankNameSchema,
@@ -33,6 +34,7 @@ export const documentFormSchema = z.object({
   iik: iikSchema,
   bik: bikSchema,
   bank: bankNameSchema,
+  cellsLine: dynamicKeyValueSchema,
 })
 
 export type DocumentFormSchema = z.infer<typeof documentFormSchema>

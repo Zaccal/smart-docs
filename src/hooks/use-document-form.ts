@@ -9,6 +9,24 @@ import { DocumentServiceInstance } from '@/services/document.service'
 export function useDocumentForm(type: Organization) {
   const form = useForm<DocumentFormSchema>({
     validate: zod4Resolver(documentFormSchema),
+    initialValues: {
+      cellsLine: [],
+      address: '',
+      bank: '',
+      bik: '',
+      bin: '',
+      city: '',
+      clientIdDateFrom: '',
+      clientIdNumber: '',
+      clientIdType: '',
+      documentDate: [],
+      enumeration: '',
+      fullnameClient: '',
+      iik: '',
+      iin: '',
+      organization: '',
+      totalAmount: '',
+    },
   })
 
   function handleSubmit(values: DocumentFormSchema) {
