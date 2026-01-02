@@ -25,7 +25,7 @@ export function useDocumentForm(type: Organization) {
       iik: '',
       iin: '',
       organization: '',
-      totalAmount: '',
+      costPerDay: '',
     },
   })
 

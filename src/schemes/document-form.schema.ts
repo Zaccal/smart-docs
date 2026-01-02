@@ -9,13 +9,13 @@ import {
   clientIdDateFromSchema,
   clientIdNumberSchema,
   clientIdTypeSchema,
+  costPerDaySchema,
   documentDateSchema,
   enumerationSchema,
   fullnameClientSchema,
   iikSchema,
   iinSchema,
   organizationSchema,
-  totalAmountSchema,
 } from './validators/fields'
 
 export const documentFormSchema = z.object({
@@ -25,7 +25,7 @@ export const documentFormSchema = z.object({
   clientIdNumber: clientIdNumberSchema,
   clientIdDateFrom: clientIdDateFromSchema,
   clientIdType: clientIdTypeSchema,
-  totalAmount: totalAmountSchema,
+  costPerDay: costPerDaySchema,
   documentDate: documentDateSchema,
   bin: binSchema,
   iin: iinSchema,

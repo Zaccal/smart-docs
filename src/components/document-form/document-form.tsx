@@ -13,7 +13,7 @@ import { IconNumber } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { useDocumentForm } from '@/hooks/use-document-form'
 import { THREE_COL, TWO_COL } from '@/lib/constants'
-import { countPerAmount } from '@/lib/utils'
+import { countTotalAmount } from '@/lib/utils'
 import 'dayjs/locale/ru'
 
 dayjs.locale('ru')
@@ -24,7 +24,7 @@ interface DocumentFormProps {
 
 export default function DocumentForm({ type }: DocumentFormProps) {
   const { form, handleSubmit } = useDocumentForm(type)
-  const isCountble = form.values.totalAmount && form.values.documentDate
+  const isCountble = form.values.costPerDay && form.values.documentDate
 
   return (
     <Box component="div" mx="auto" className="mt-10 max-w-4xl md:px-0 px-2  pb-12">
@@ -235,18 +235,18 @@ export default function DocumentForm({ type }: DocumentFormProps) {
                 <TextInput
                   variant="filled"
                   size="lg"
-                  {...form.getInputProps('totalAmount')}
+                  {...form.getInputProps('costPerDay')}
                   key={form.key('totalAmount')}
-                  label="Общая сумма"
-                  placeholder="31 000"
+                  label="За сутки проживания"
+                  placeholder="15 000"
                   required
                 />
               </Grid.Col>
               <Grid.Col {...TWO_COL}>
-                <p className="text-lg -mt-1">За день проживания</p>
+                <p className="text-lg -mt-1">Общая стоимост</p>
                 <div className="border mt-1 border-gray-200 px-4 py-2.5 rounded-md">
                   <span className="text-lg text-gray-500">
-                    {isCountble ? countPerAmount(Number(form.values.totalAmount), form.values.documentDate) : '0'}
+                    {isCountble ? countTotalAmount(Number(form.values.costPerDay), form.values.documentDate) : '0'}
                     {' '}
                     тенге
                   </span>

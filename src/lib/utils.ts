@@ -2,13 +2,14 @@ import type { CellRichTextValue, CellValue } from 'exceljs'
 import type { DocumentType } from '@/types/types'
 import { HUNDREDS, ONES, ONES_FEMALE, TEENS, TENS } from './constants'
 
-export function countPerAmount(amount: number, dateRange: string[]): number {
+export function countTotalAmount(perDay: number, dateRange: string[]): number {
   const startDate = new Date(dateRange[0])
   const endDate = new Date(dateRange[1])
 
   const timeDiff = endDate.getTime() - startDate.getTime()
-  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
-  return Math.floor(amount / daysDiff)
+  const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24))
+
+  return perDay * daysDiff
 }
 
 export function formatWithSpacesNumber(amount: number | string): string {

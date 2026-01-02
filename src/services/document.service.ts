@@ -9,7 +9,7 @@ import ExcelJS from 'exceljs'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import PizZip from 'pizzip'
-import { countPerAmount, documentNaming, formatNumberToRussian, formatWithSpacesNumber, isRichTextValue } from '@/lib/utils'
+import { countTotalAmount, documentNaming, formatNumberToRussian, formatWithSpacesNumber, isRichTextValue } from '@/lib/utils'
 import { DocumentLoaderServiceInstance } from './document-loader.service'
 
 class DocumentService {
@@ -38,7 +38,7 @@ class DocumentService {
     await workbook.xlsx.load(documentTempalateBuffer)
 
     const sheet = workbook.getWorksheet(1)
-    const countedPerAmount = countPerAmount(Number(data.totalAmount), data.documentDate)
+    const countedTotalAmount = countTotalAmount(Number(data.costPerDay), data.documentDate)
 
     // if (data.cellsLine.length && sheet) {
     //   this.fillDynamicRows(sheet, data.cellsLine, 22)
@@ -47,15 +47,15 @@ class DocumentService {
     if (sheet) {
       this.fillTemplatePlaceholdersXlsx(sheet, {
         ...data,
-        perAmount: formatWithSpacesNumber(countedPerAmount),
+        perAmount: formatWithSpacesNumber(data.costPerDay),
         documentDateFrom: dayjs(new Date(data.documentDate[0])).format('DD MMMM YYYYг'),
         documentDateTo: dayjs(new Date(data.documentDate[1])).format('DD MMMM YYYYг'),
         documentDateFromNumeric: dayjs(new Date(data.documentDate[0])).format('DD.MM.YYYYг'),
         documentDateToNumeric: dayjs(new Date(data.documentDate[1])).format('DD.MM.YYYYг'),
         clientIdDateFrom: dayjs(new Date(data.clientIdDateFrom)).format('DD.MM.YYYY'),
-        totalAmount: formatWithSpacesNumber(data.totalAmount),
-        totalAmountRussian: formatNumberToRussian(Number(data.totalAmount)).toLocaleLowerCase(),
-        perAmountRussian: formatNumberToRussian(countedPerAmount).toLocaleLowerCase(),
+        totalAmount: formatWithSpacesNumber(countedTotalAmount),
+        totalAmountRussian: formatNumberToRussian(countedTotalAmount).toLocaleLowerCase(),
+        perAmountRussian: formatNumberToRussian(Number(data.costPerDay)).toLocaleLowerCase(),
       })
     }
 
@@ -107,17 +107,17 @@ class DocumentService {
         linebreaks: true,
       })
 
-      const countedPerAmount = countPerAmount(Number(data.totalAmount), data.documentDate)
+      const countedTotalAmount = countTotalAmount(Number(data.costPerDay), data.documentDate)
 
       documentTemplate.setData({
         ...data,
         documentDateFrom: dayjs(new Date(data.documentDate[0])).format('«DD» MMMM YYYYг'),
         documentDateTo: dayjs(new Date(data.documentDate[1])).format('«DD» MMMM YYYYг'),
         clientIdDateFrom: dayjs(new Date(data.clientIdDateFrom)).format('DD.MM.YYYY'),
-        perAmount: formatWithSpacesNumber(countedPerAmount),
-        totalAmount: formatWithSpacesNumber(data.totalAmount),
-        totalAmountRussian: formatNumberToRussian(Number(data.totalAmount)),
-        perAmountRussian: formatNumberToRussian(countedPerAmount),
+        perAmount: formatWithSpacesNumber(data.costPerDay),
+        totalAmount: formatWithSpacesNumber(countedTotalAmount),
+        totalAmountRussian: formatNumberToRussian(Number(countedTotalAmount)),
+        perAmountRussian: formatNumberToRussian(Number(data.costPerDay)),
       })
 
       documentTemplate.render()

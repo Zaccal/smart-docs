@@ -36,7 +36,7 @@ export const clientIdDateFromSchema = z.string()
 
 export const clientIdTypeSchema = z.string().default('МВД РК')
 
-export const totalAmountSchema = z.string()
+export const costPerDaySchema = z.string().trim().refine(val => isDigits(val))
 
 export const documentDateSchema = z.array(z.string()).length(2, { message: 'Выберите период документа' })
 
