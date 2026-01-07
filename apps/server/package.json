@@ -1,0 +1,9 @@
+{
+  "name": "@smart-docs/server",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "air",
+    "build": "go build -o dist/server main.go"
+  },
+  "private": true
+}

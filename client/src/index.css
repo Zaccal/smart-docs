@@ -1,7 +1,0 @@
-@import "tailwindcss";
-
-@layer components {
-  .container {
-    @apply mx-auto max-w-screen-lg px-5;
-  }
-}
