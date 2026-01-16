@@ -9,3 +9,7 @@ export interface FillDynamicRowsOptions {
   textColumn?: number
   items: DynamicKeyValueSchema
 }
+
+export interface DocumentServiceOptions {
+  onSuccess?: () => void
+}

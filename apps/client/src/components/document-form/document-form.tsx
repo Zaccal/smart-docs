@@ -14,6 +14,7 @@ import dayjs from 'dayjs'
 import { useDocumentForm } from '@/hooks/use-document-form'
 import { THREE_COL, TWO_COL } from '@/lib/constants'
 import { countTotalAmount } from '@/lib/utils'
+import DynamicKeyValueBlock from './dynamic-key-value-block/dynamic-key-value-block'
 import 'dayjs/locale/ru'
 
 dayjs.locale('ru')
@@ -27,7 +28,11 @@ export default function DocumentForm({ type }: DocumentFormProps) {
   const isCountble = form.values.costPerDay && form.values.documentDate
 
   return (
-    <Box component="div" mx="auto" className="mt-10 max-w-4xl md:px-0 px-2  pb-12">
+    <Box
+      component="div"
+      mx="auto"
+      className="mt-10 max-w-4xl md:px-0 px-2  pb-12"
+    >
       <h1 className="mb-4 text-xl font-black text-center">
         {type === 'XANSHA' ? 'ИП "XANSHA"' : 'ИП "NOMADDOCS"'}
       </h1>
@@ -246,7 +251,12 @@ export default function DocumentForm({ type }: DocumentFormProps) {
                 <p className="text-lg -mt-1">Общая стоимост</p>
                 <div className="border mt-1 border-gray-200 px-4 py-2.5 rounded-md">
                   <span className="text-lg text-gray-500">
-                    {isCountble ? countTotalAmount(Number(form.values.costPerDay), form.values.documentDate) : '0'}
+                    {isCountble
+                      ? countTotalAmount(
+                          Number(form.values.costPerDay),
+                          form.values.documentDate,
+                        )
+                      : '0'}
                     {' '}
                     тенге
                   </span>
@@ -255,9 +265,14 @@ export default function DocumentForm({ type }: DocumentFormProps) {
             </Grid>
           </Fieldset>
 
-          {/* <DynamicKeyValueBlock form={form} /> */}
+          <DynamicKeyValueBlock form={form} />
 
-          <Button fullWidth size="lg" type="submit">
+          <Button
+            loading={form.submitting}
+            fullWidth
+            size="lg"
+            type="submit"
+          >
             Сделать документы
           </Button>
         </Stack>

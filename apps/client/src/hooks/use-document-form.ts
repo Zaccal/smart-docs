@@ -29,19 +29,31 @@ export function useDocumentForm(type: Organization) {
     },
   })
 
-  function handleSubmit(values: DocumentFormSchema) {
-    notifications.show({
-      title: 'Форма успешно отправлена',
-      message: 'Ваш документ в процессе обработки',
-      color: 'green',
-    })
-
+  async function handleSubmit(values: DocumentFormSchema) {
     const data = documentFormSchema.parse(values)
 
-    if (type === 'NOMADDOCS')
-      DocumentServiceInstance.processDocuments(data, 'NOMADDOCS')
-    else
-      DocumentServiceInstance.processDocuments(data, 'XANSHA')
+    if (type === 'NOMADDOCS') {
+      await DocumentServiceInstance.processDocuments(data, 'NOMADDOCS', {
+        onSuccess: () => {
+          notifications.show({
+            title: 'Success',
+            message: 'Documents processed successfully',
+            color: 'green',
+          })
+        },
+      })
+    }
+    else {
+      await DocumentServiceInstance.processDocuments(data, 'XANSHA', {
+        onSuccess: () => {
+          notifications.show({
+            title: 'Success',
+            message: 'Documents processed successfully',
+            color: 'green',
+          })
+        },
+      })
+    }
   }
 
   return { form, handleSubmit }

@@ -1,7 +1,8 @@
 import type TypeExcelJS from 'exceljs'
 import type { RichText } from 'exceljs'
 import type { DocumentFormSchema } from '@/schemes/document-form.schema'
-import type { DocumentType, Organization } from '@/types/types'
+import type { DynamicKeyValueSchema } from '@/schemes/dynamic-key-value.schema'
+import type { DocumentServiceOptions, DocumentType, Organization } from '@/types/types'
 import { notifications } from '@mantine/notifications'
 import dayjs from 'dayjs'
 import Docxtemplater from 'docxtemplater'
@@ -9,17 +10,18 @@ import ExcelJS from 'exceljs'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import PizZip from 'pizzip'
+import { PostSetAdditionalOptionsInvoice } from '@/api/api'
 import { countTotalAmount, documentNaming, formatNumberToRussian, formatWithSpacesNumber, isRichTextValue } from '@/lib/utils'
 import { DocumentLoaderServiceInstance } from './document-loader.service'
 
 class DocumentService {
   constructor() { }
-  async processDocuments(data: DocumentFormSchema, organization: Organization = 'NOMADDOCS') {
+  async processDocuments(data: DocumentFormSchema, organization: Organization = 'NOMADDOCS', options?: DocumentServiceOptions) {
     const zip = new JSZip()
     const contract = await this.processDocumentConract(data, organization)
     const invoice = await this.processDocumentXlsx(data, organization, 'INVOICE')
 
-    if (contract) {
+    if (contract && invoice) {
       zip.file(contract.filename, contract.blob)
       zip.file(invoice.filename, invoice.blob)
 
@@ -28,6 +30,7 @@ class DocumentService {
 
       saveAs(zipBlob, zipFilename)
     }
+    options?.onSuccess?.()
   }
 
   private async processDocumentXlsx(data: DocumentFormSchema, organization: Organization = 'NOMADDOCS', documentType: DocumentType) {
@@ -39,10 +42,6 @@ class DocumentService {
 
     const sheet = workbook.getWorksheet(1)
     const countedTotalAmount = countTotalAmount(Number(data.costPerDay), data.documentDate)
-
-    // if (data.cellsLine.length && sheet) {
-    //   this.fillDynamicRows(sheet, data.cellsLine, 22)
-    // }
 
     if (sheet) {
       this.fillTemplatePlaceholdersXlsx(sheet, {
@@ -63,12 +62,36 @@ class DocumentService {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
     const filename = documentNaming(documentType, data.fullnameClient)
 
+    if (data.cellsLine.length) {
+      const finalBlob = await this.fillDynamicRows(new File([blob], filename, {
+        type: blob.type,
+        lastModified: Date.now(),
+      }), data.cellsLine)
+
+      if (finalBlob) {
+        return { blob: finalBlob, filename }
+      }
+      return { blob, filename }
+    }
+
     return { blob, filename }
   }
 
-  // private fillDynamicRows(sheet: ExcelJS.Worksheet, data: DynamicKeyValueSchema, startRow: number) {
+  private async fillDynamicRows(file: File, data: DynamicKeyValueSchema) {
+    const response = await PostSetAdditionalOptionsInvoice(file, data)
 
-  // }
+    if (response.status !== 200) {
+      notifications.show({
+        title: 'Ошибка',
+        message: 'Ошибка при сохранении дополнительных опций счет фактуры',
+      })
+      return
+    }
+
+    const blob = await response.blob()
+
+    return blob
+  }
 
   private fillTemplatePlaceholdersXlsx(sheet: TypeExcelJS.Worksheet, data: Record<string, unknown>) {
     const regex = /\{\{([^}]+)\}\}/g

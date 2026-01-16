@@ -21,6 +21,7 @@ function DynamicKeyValueBlock({ form }: DynamicKeyValueBlockProps) {
           <Grid.Col span={5}>
             <TextInput
               size="lg"
+              disabled={form.submitting}
               placeholder="Ключ"
               {...form.getInputProps(`cellsLine.${index}.label`)}
             />
@@ -28,6 +29,7 @@ function DynamicKeyValueBlock({ form }: DynamicKeyValueBlockProps) {
           <Grid.Col span={5}>
             <TextInput
               size="lg"
+              disabled={form.submitting}
               placeholder="Значение"
               {...form.getInputProps(`cellsLine.${index}.value`)}
             />
@@ -36,6 +38,7 @@ function DynamicKeyValueBlock({ form }: DynamicKeyValueBlockProps) {
             <Button
               fullWidth
               type="button"
+              disabled={form.submitting}
               size="lg"
               color="red"
               onClick={() => form.removeListItem('cellsLine', index)}
@@ -52,7 +55,9 @@ function DynamicKeyValueBlock({ form }: DynamicKeyValueBlockProps) {
           size="lg"
           fullWidth
           variant="outline"
-          onClick={() => form.insertListItem('cellsLine', { label: '', value: '' })}
+          disabled={form.submitting}
+          onClick={() =>
+            form.insertListItem('cellsLine', { label: '', value: '' })}
         >
           Добавить строку
         </Button>
