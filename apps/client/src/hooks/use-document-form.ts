@@ -36,8 +36,7 @@ export function useDocumentForm(type: Organization) {
       await DocumentServiceInstance.processDocuments(data, 'NOMADDOCS', {
         onSuccess: () => {
           notifications.show({
-            title: 'Success',
-            message: 'Documents processed successfully',
+            message: 'Документы обработаны успешно',
             color: 'green',
           })
         },
@@ -47,8 +46,7 @@ export function useDocumentForm(type: Organization) {
       await DocumentServiceInstance.processDocuments(data, 'XANSHA', {
         onSuccess: () => {
           notifications.show({
-            title: 'Success',
-            message: 'Documents processed successfully',
+            message: 'Документы обработаны успешно',
             color: 'green',
           })
         },
