@@ -12,15 +12,17 @@ import (
 
 func main() {
 	godotenv.Load()
-
 	PORT := os.Getenv("PORT")
+	if PORT == "" {
+		PORT = "8080"
+	}
 
 	router := gin.Default()
 
-	err := router.SetTrustedProxies([]string{
-		"127.0.0.1",
-		"::1",
-	})
+	err := router.SetTrustedProxies([]string{"127.0.0.1", "::1"})
+	if err != nil {
+		panic(err)
+	}
 
 	router.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
@@ -33,19 +35,17 @@ func main() {
 		c.Next()
 	})
 
-	if err != nil {
-		panic(err)
+	api := router.Group("/api")
+	{
+		api.GET("/ping", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{
+				"message": "pong",
+			})
+		})
+
+		api.POST("/invoice/set-options-invoice", handlers.SetAdditionalOptionsInvoice)
 	}
 
-	router.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
-	router.POST("/excel/additianl-options-invoice", handlers.AdditianlOptionsInvoice)
-
-	router.Run()
-
-	fmt.Printf("The server runing on port: %v", PORT)
+	fmt.Printf("The server is running on port: %v\n", PORT)
+	router.Run(":" + PORT)
 }
