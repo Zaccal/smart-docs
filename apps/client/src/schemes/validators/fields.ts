@@ -63,3 +63,5 @@ export const iikSchema = z.string().trim().length(20)
 export const bikSchema = z.string().trim().length(8)
 
 export const bankNameSchema = z.string().trim().min(5, { message: 'Введите корректное название банка' })
+
+export const indexSchema = z.string().trim().min(6, { message: 'Введите корректный индекс' })

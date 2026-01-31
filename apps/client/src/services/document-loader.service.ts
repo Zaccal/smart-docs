@@ -1,10 +1,12 @@
 import type { DocumentType, Organization } from '@/types/types'
 import nomadContractTemplate from '../document-templates/nomad/contract.docx?url'
+import xanshaActTemplate from '../document-templates/xansha/act.xlsx?url'
+import xanshaCashReceiptTemplate from '../document-templates/xansha/cash-receipt.xlsx?url'
 import xanshaContractTemplate from '../document-templates/xansha/contract.docx?url'
 import xanshaInvoiceTemplate from '../document-templates/xansha/invoice.xlsx?url'
 
 class DocumentLoaderService {
-  constructor() {}
+  constructor() { }
   async loadTemplate(orgonazation: Organization, documentType: DocumentType = 'CONTRACT') {
     switch (documentType) {
       case 'CONTRACT':
@@ -13,7 +15,9 @@ class DocumentLoaderService {
         // TODO: Do not forget to add nomad invoice template when it will be available for nomad organization
         return await fetch(orgonazation === 'NOMADDOCS' ? nomadContractTemplate : xanshaInvoiceTemplate)
       case 'ACT':
+        return await fetch(orgonazation === 'NOMADDOCS' ? xanshaActTemplate : xanshaActTemplate)
       case 'CASH_RECEIPT':
+        return await fetch(orgonazation === 'NOMADDOCS' ? xanshaCashReceiptTemplate : xanshaCashReceiptTemplate)
       default:
         return await fetch(orgonazation === 'NOMADDOCS' ? nomadContractTemplate : xanshaContractTemplate)
     }

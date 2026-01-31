@@ -19,7 +19,7 @@ func main() {
 
 	router := gin.Default()
 
-	err := router.SetTrustedProxies([]string{"127.0.0.1", "::1"})
+	err := router.SetTrustedProxies(nil)
 	if err != nil {
 		panic(err)
 	}

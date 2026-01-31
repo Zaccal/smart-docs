@@ -76,7 +76,7 @@ export default function DocumentForm({ type }: DocumentFormProps) {
           {/* CLIENT INFO */}
           <Fieldset legend="Информация о организации и клиенте">
             <Grid gutter="md" mb="md">
-              <Grid.Col {...TWO_COL}>
+              <Grid.Col {...THREE_COL}>
                 <TextInput
                   variant="filled"
                   size="lg"
@@ -87,8 +87,18 @@ export default function DocumentForm({ type }: DocumentFormProps) {
                   required
                 />
               </Grid.Col>
-
-              <Grid.Col {...TWO_COL}>
+              <Grid.Col {...THREE_COL}>
+                <TextInput
+                  variant="filled"
+                  size="lg"
+                  {...form.getInputProps('index')}
+                  key={form.key('index')}
+                  label="Индекс"
+                  placeholder="123456"
+                  required
+                />
+              </Grid.Col>
+              <Grid.Col {...THREE_COL}>
                 <TextInput
                   variant="filled"
                   size="lg"
@@ -253,9 +263,9 @@ export default function DocumentForm({ type }: DocumentFormProps) {
                   <span className="text-lg text-gray-500">
                     {isCountble
                       ? countTotalAmount(
-                          Number(form.values.costPerDay),
-                          form.values.documentDate,
-                        )
+                        Number(form.values.costPerDay),
+                        form.values.documentDate,
+                      )
                       : '0'}
                     {' '}
                     тенге

@@ -106,3 +106,18 @@ export function generateUUID(): string {
     return v.toString(16)
   })
 }
+
+export function countDays(dateRange: string[]): number {
+  const startDate = new Date(dateRange[0])
+  const endDate = new Date(dateRange[1])
+
+  const diffInMs = endDate.getTime() - startDate.getTime()
+
+  const diffInDays = diffInMs / (1000 * 60 * 60 * 24)
+
+  return Math.floor(diffInDays)
+}
+
+export function upperCaseFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}

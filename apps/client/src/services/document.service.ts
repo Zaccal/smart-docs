@@ -1,4 +1,3 @@
-import type TypeExcelJS from 'exceljs'
 import type { RichText } from 'exceljs'
 import type { DocumentFormSchema } from '@/schemes/document-form.schema'
 import type { DynamicKeyValueSchema } from '@/schemes/dynamic-key-value.schema'
@@ -11,7 +10,7 @@ import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import PizZip from 'pizzip'
 import { PostSetAdditionalOptionsInvoice } from '@/api/api'
-import { countTotalAmount, documentNaming, formatNumberToRussian, formatWithSpacesNumber, isRichTextValue } from '@/lib/utils'
+import { countDays, countTotalAmount, documentNaming, formatNumberToRussian, formatWithSpacesNumber, isRichTextValue, upperCaseFirstLetter } from '@/lib/utils'
 import { DocumentLoaderServiceInstance } from './document-loader.service'
 
 class DocumentService {
@@ -20,10 +19,14 @@ class DocumentService {
     const zip = new JSZip()
     const contract = await this.processDocumentConract(data, organization)
     const invoice = await this.processDocumentXlsx(data, organization, 'INVOICE')
+    const act = await this.processDocumentXlsx(data, organization, 'ACT')
+    const cashReceipt = await this.processDocumentXlsx(data, organization, 'CASH_RECEIPT')
 
-    if (contract && invoice) {
+    if (contract && invoice && act && cashReceipt) {
       zip.file(contract.filename, contract.blob)
       zip.file(invoice.filename, invoice.blob)
+      zip.file(act.filename, act.blob)
+      zip.file(cashReceipt.filename, cashReceipt.blob)
 
       const zipBlob = await zip.generateAsync({ type: 'blob' })
       const zipFilename = documentNaming('ALL', data.fullnameClient)
@@ -42,10 +45,12 @@ class DocumentService {
 
     const sheet = workbook.getWorksheet(1)
     const countedTotalAmount = countTotalAmount(Number(data.costPerDay), data.documentDate)
+    const countOfDays = countDays(data.documentDate)
 
     if (sheet) {
       this.fillTemplatePlaceholdersXlsx(sheet, {
         ...data,
+        enumerationNumeric: data.enumeration.slice(1),
         perAmount: formatWithSpacesNumber(data.costPerDay),
         documentDateFrom: dayjs(new Date(data.documentDate[0])).format('DD MMMM YYYYг'),
         documentDateTo: dayjs(new Date(data.documentDate[1])).format('DD MMMM YYYYг'),
@@ -53,8 +58,9 @@ class DocumentService {
         documentDateToNumeric: dayjs(new Date(data.documentDate[1])).format('DD.MM.YYYYг'),
         clientIdDateFrom: dayjs(new Date(data.clientIdDateFrom)).format('DD.MM.YYYY'),
         totalAmount: formatWithSpacesNumber(countedTotalAmount),
-        totalAmountRussian: formatNumberToRussian(countedTotalAmount).toLocaleLowerCase(),
-        perAmountRussian: formatNumberToRussian(Number(data.costPerDay)).toLocaleLowerCase(),
+        totalAmountRussian: upperCaseFirstLetter(formatNumberToRussian(countedTotalAmount).toLocaleLowerCase()),
+        perAmountRussian: upperCaseFirstLetter(formatNumberToRussian(Number(data.costPerDay)).toLocaleLowerCase()),
+        countOfDays,
       })
     }
 
@@ -62,7 +68,7 @@ class DocumentService {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
     const filename = documentNaming(documentType, data.fullnameClient)
 
-    if (data.cellsLine.length) {
+    if (data.cellsLine.length && documentType === 'INVOICE') {
       const finalBlob = await this.fillDynamicRows(new File([blob], filename, {
         type: blob.type,
         lastModified: Date.now(),
@@ -93,7 +99,7 @@ class DocumentService {
     return blob
   }
 
-  private fillTemplatePlaceholdersXlsx(sheet: TypeExcelJS.Worksheet, data: Record<string, unknown>) {
+  private fillTemplatePlaceholdersXlsx(sheet: ExcelJS.Worksheet, data: Record<string, unknown>) {
     const regex = /\{\{([^}]+)\}\}/g
     sheet.eachRow((row) => {
       row.eachCell((cell) => {

@@ -1,8 +1,8 @@
 import type { DynamicKeyValueSchema } from '@/schemes/dynamic-key-value.schema'
 
-enum Routes {
-  SetOptionsInvoice = '/invoice/set-options-invoice',
-}
+const Routes = {
+  SetOptionsInvoice: '/invoice/set-options-invoice',
+} as const
 
 export const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api`
 

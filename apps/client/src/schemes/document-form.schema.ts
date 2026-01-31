@@ -15,6 +15,7 @@ import {
   fullnameClientSchema,
   iikSchema,
   iinSchema,
+  indexSchema,
   organizationSchema,
 } from './validators/fields'
 
@@ -35,6 +36,7 @@ export const documentFormSchema = z.object({
   bik: bikSchema,
   bank: bankNameSchema,
   cellsLine: dynamicKeyValueSchema,
+  index: indexSchema,
 })
 
 export type DocumentFormSchema = z.infer<typeof documentFormSchema>
